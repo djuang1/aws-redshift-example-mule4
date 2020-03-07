@@ -1,0 +1,4 @@
+db:
+  user: ""
+  password: ""
+  url: "jdbc:redshift://azredshift.<id>.<region>.redshift.amazonaws.com:5439/<db>"

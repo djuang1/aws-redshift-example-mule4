@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="7c33d613-a7d0-4484-b4c5-4798724bed4d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="afdd352d-f918-4cf3-ad02-26ad0183c4b1" >
+		<db:generic-connection url="${db.url}" driverClassName="com.amazon.redshift.jdbc42.Driver" user="${db.user}" password="${db.password}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="79b8f6b2-df13-4ca6-97fc-14a68b5af1df" file="mule-properties.yaml" />
+	<flow name="aws-redshift-example-mule4Flow" doc:id="e6b05bda-4f7d-4b3d-893a-24f404ff47a5" >
+		<http:listener doc:name="Listener" doc:id="24b3e631-eea6-4ad1-82d2-4bd69339cd64" config-ref="HTTP_Listener_config" path="/records"/>
+		<db:select doc:name="Select" doc:id="f83b3446-0ccd-4637-9b2a-83119aab571b" config-ref="Database_Config">
+			<db:sql >SELECT * FROM public.contact limit 10;
+</db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="25ed2543-8556-4be1-8b1a-1cae29d1d851" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
